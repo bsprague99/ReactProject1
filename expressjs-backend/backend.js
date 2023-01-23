@@ -6,7 +6,6 @@ const port = 5000;
 app.use(cors());
 app.use(express.json());
 
-
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 }); 
@@ -86,26 +85,29 @@ function findUserById(id) {
 
 app.post('/users', (req, res) => {
    const userToAdd = req.body;
+   
    addUser(userToAdd);
-   fetch('http://localhost:5000/users');
-   res.status(200).end();
+   
+   res.status(201).send(userToAdd); //this is step 3 and we are sending the entire user object back. Now we need to handle the rest on the front end to "pluck" the ID out
 });
 
 function addUser(user){
+   user.id = generateRandomId();
    users['users_list'].push(user);
 }
 
-
-/*   
-http://localhost:5000/users/abc123   
-{
-   id : 'abc123', 
+function generateRandomId() {
+   let string = "";
+   for (let i = 0; i < 6; i++) {
+       string += Math.floor(Math.random() * 10);
+   }
+   return string;
 }
-*/
+
 app.delete('/users/:id', (req, res) => {
    const id = req.params['id'];
    deleteUser(id);
-   res.status(200).end();
+   res.status(204).end();
 });
 
 function deleteUser(id){

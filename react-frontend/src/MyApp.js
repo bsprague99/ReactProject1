@@ -7,16 +7,33 @@ function MyApp() {
 
     const [characters, setCharacters] = useState([]);
 
-    function removeOneCharacter (index) {
+    async function removeOneCharacter (index) {
         const updated = characters.filter((character, i) => {
             return i !== index
-          });
-          setCharacters(updated);
-    }  
+        });
+        setCharacters(updated);  
 
-    function updateList(person) {
-        setCharacters([...characters, person]);
-    } 
+        const Id = characters[index].id; 
+        const response = await axios.delete(`http://localhost:5000/users/${Id}`);
+        
+        if (response.status === 204) {
+            console.log(`deleted success`);
+        }
+        else{
+            console.log(`delete failed `);
+        }
+    }  
+    
+    function updateList(person) { 
+        makePostCall(person).then( result => {
+            if (result && result.status === 201){
+                console.log(`added success`);
+            }  
+            else{
+                console.log(`added failed`);
+            }
+        });
+    }
 
     async function fetchAll(){
         try {
@@ -36,6 +53,18 @@ function MyApp() {
             setCharacters(result);
         });
     }, [] );
+
+    async function makePostCall(person){
+        try {
+           const response = await axios.post('http://localhost:5000/users', person);
+           setCharacters([...characters, response.data]);
+           return response;
+        }
+        catch (error) {
+           console.log(error);
+           return false;
+        }
+    }
 
     return (
         <div className="container">
